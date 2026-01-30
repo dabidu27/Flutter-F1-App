@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'models/Driver.dart';
+import 'services/api_service.dart';
 
 void main() {
   runApp(const F1App());
@@ -18,8 +20,22 @@ class F1App extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  //flutter style constructor that calls the constructor of the base class (StatefulWidget)
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Driver>> top3Future;
+
+  @override
+  void initState() {
+    super.initState();
+    top3Future = ApiService.fetchLastRaceTop3();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,12 +126,52 @@ class HomeScreen extends StatelessWidget {
                     SizedBox(height: 6),
                     Text("07 December 2025"),
 
-                    Column(
-                      children: [
-                        DriverTile(null, "Max Verstappen", "Red Bull", "1"),
-                        DriverTile(null, "Oscar Piastri", "McLaren", "2"),
-                        DriverTile(null, "Lando Norris", "McLaren", "3"),
-                      ],
+                    // // Column(
+                    // //   children: [
+                    // //     // DriverTile(null, "Max Verstappen", "Red Bull", "1"),
+                    // //     // DriverTile(null, "Oscar Piastri", "McLaren", "2"),
+                    // //     // DriverTile(null, "Lando Norris", "McLaren", "3"),
+                    // //   ],
+                    // ),
+                    SizedBox(height: 12),
+                    FutureBuilder<List<Driver>>(
+                      future: top3Future,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        }
+
+                        if (!snapshot.hasData) {
+                          return Text("No data");
+                        }
+
+                        final drivers = snapshot
+                            .data!; //! is a null check, so the map method knows we don t parse null data
+
+                        return Column(
+                          //drivers is a List<Driver> (it was wrapped in a Future object)
+                          //so we need to convert each Driver object into a DriverTile card
+                          //and also make it a list at the end because children: needs a list
+                          children: drivers
+                              .map(
+                                (driver) => DriverTile(
+                                  null,
+                                  driver.name,
+                                  driver.team,
+                                  driver.pos,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
                     ),
                   ],
                 ),
