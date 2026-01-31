@@ -30,11 +30,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Driver>> top3Future;
+  late Future<List<Driver>> top3ChampionshipFuture;
 
   @override
   void initState() {
     super.initState();
     top3Future = ApiService.fetchLastRaceTop3();
+    top3ChampionshipFuture = ApiService.fetchStandingsTop3();
   }
 
   @override
@@ -197,14 +199,49 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    DriverTile(
-                      null,
-                      "Max Verstappen",
-                      "Red Bull",
-                      "1",
-                    ), //null first because we pass no Key key argument
-                    DriverTile(null, "Lewis Hamilton", "Ferrari", "2"),
-                    DriverTile(null, "Lando Norris", "McLaren", "3"),
+
+                    // DriverTile(
+                    //   null,
+                    //   "Max Verstappen",
+                    //   "Red Bull",
+                    //   "1",
+                    // ), //null first because we pass no Key key argument
+                    // DriverTile(null, "Lewis Hamilton", "Ferrari", "2"),
+                    // DriverTile(null, "Lando Norris", "McLaren", "3"),
+                    FutureBuilder<List<Driver>>(
+                      future: top3ChampionshipFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        }
+
+                        if (!snapshot.hasData) {
+                          return Text("No data");
+                        }
+
+                        final drivers = snapshot.data!;
+                        return Column(
+                          children: drivers
+                              .map(
+                                (driver) => DriverTile(
+                                  null,
+                                  driver.name,
+                                  driver.team,
+                                  driver.pos,
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
