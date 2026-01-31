@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from models import Drivers
+from models import Drivers, DriversWithPoints
 from get_data import getStandingsData, getChampionshipStandings
 
 
@@ -32,7 +32,7 @@ async def getStandings():
 @app.get(
     "/championship/standings",
     status_code=status.HTTP_200_OK,
-    response_model=list[Drivers],
+    response_model=list[DriversWithPoints],
 )
 async def getChampionship():
 
@@ -40,7 +40,11 @@ async def getChampionship():
     driversResponse = []
     pos = 1
     for driver in drivers:
-        driversResponse.append(Drivers(name=driver[0], team=driver[1], pos=str(pos)))
+        driversResponse.append(
+            DriversWithPoints(
+                name=driver[0], team=driver[1], pos=str(pos), points=str(int(driver[2]))
+            )
+        )
         pos += 1
 
     return driversResponse

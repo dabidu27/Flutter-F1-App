@@ -33,20 +33,26 @@ def _loadChampionshipStandings():
     ergast = Ergast()
     standings = ergast.get_driver_standings(season=2025)
     standings_df = standings.content[0][:3][
-        ["givenName", "familyName", "constructorNames"]
+        ["givenName", "familyName", "constructorNames", "points"]
     ]
     # print(standings_df[["position", "givenName", "familyName", "constructorNames"]])
     driver1 = (
         f"{standings_df.iloc[0, 0]} {standings_df.iloc[0, 1]}",
         standings_df.iloc[0, 2][0],
+        standings_df.iloc[0, 3],
     )
     driver2 = (
         f"{standings_df.iloc[1, 0]} {standings_df.iloc[1, 1]}",
         standings_df.iloc[1, 2][0],
+        standings_df.iloc[1, 3],
     )
     driver3 = (
         f"{standings_df.iloc[2, 0]} {standings_df.iloc[2, 1]}",
         standings_df.iloc[2, 2][0],
+        standings_df.iloc[2, 3],
     )
 
     return [driver1, driver2, driver3]
+
+
+_loadChampionshipStandings()
