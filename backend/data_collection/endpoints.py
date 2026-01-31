@@ -48,3 +48,10 @@ async def getChampionship():
         pos += 1
 
     return driversResponse
+
+
+@app.get("/last_race/data", response_model=RaceData, status_code=status.HTTP_200_OK)
+async def fetchLastRaceData():
+
+    lastRaceData = await getLastRace()
+    return RaceData(name=lastRaceData[0], date=lastRaceData[1])

@@ -78,5 +78,6 @@ def _getLastRace():
     past_races = races[races["raceDate"] <= now]
     past_races = past_races.sort_values("raceDate", ascending=False)
     date = past_races.iloc[0]["raceDate"]
+    date_str = date.strftime("%d %B %Y")
     name = past_races.iloc[0]["raceName"]
-    return (str(date), name)
+    return (name, date_str)
