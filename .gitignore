@@ -1,0 +1,74 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment
+venv/
+.env
+*.env
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# FastF1 Cache
+# -------------------------
+fastf1_cache/
+*/fastf1_cache/
+
+# -------------------------
+# Data
+# -------------------------
+# Large raw FastF1 CSVs/parquet files
+data/
+*.csv
+*.parquet
+*.pkl
+*.feather
+
+# Exported training or prediction data
+datasets/
+exports/
+
+# -------------------------
+# Secrets
+# -------------------------
+secrets.env
+config/secrets.env
+mongodb_key.txt
+*.key
+*.pem
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+
+# -------------------------
+# Models
+# -------------------------
+saved_models/
+*.h5
+*.pt
+*.onnx
+
+# -------------------------
+# Build artifacts
+# -------------------------
+dist/
+build/
