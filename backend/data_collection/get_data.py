@@ -2,6 +2,7 @@ import fastf1 as f1
 import pandas as pd
 import asyncio
 from fastf1.ergast import Ergast
+from datetime import datetime, timezone
 
 f1.Cache.enable_cache("fastf1_cache")
 
@@ -15,9 +16,22 @@ async def getChampionshipStandings():
     return await asyncio.to_thread(_loadChampionshipStandings)
 
 
+async def getLastRace():
+    return await asyncio.to_thread(_getLastRace)
+
+
 def _loadStandings():
 
-    session = f1.get_session(2025, "Abu Dhabi", "Race")
+    ergast = Ergast()
+    races = ergast.get_race_schedule(season=2025)
+    races["raceDate"] = pd.to_datetime(races["raceDate"], utc=True)
+    now = datetime.now(timezone.utc)
+    past_races = races[races["raceDate"] <= now]
+    past_races = past_races.sort_values("raceDate", ascending=False)
+    round = past_races.iloc[0]["round"]
+    name = past_races.iloc[0]["raceName"]
+
+    session = f1.get_session(2025, round, "Race")
     session.load()
 
     top3 = session.results[:3][["FullName", "TeamName"]]
@@ -55,8 +69,14 @@ def _loadChampionshipStandings():
     return [driver1, driver2, driver3]
 
 
-ergast = Ergast()
+def _getLastRace():
 
-races = ergast.get_race_results(season=2025)
-races_df = races.content[0]
-print(races_df)
+    ergast = Ergast()
+    races = ergast.get_race_schedule(season=2025)
+    races["raceDate"] = pd.to_datetime(races["raceDate"], utc=True)
+    now = datetime.now(timezone.utc)
+    past_races = races[races["raceDate"] <= now]
+    past_races = past_races.sort_values("raceDate", ascending=False)
+    date = past_races.iloc[0]["raceDate"]
+    name = past_races.iloc[0]["raceName"]
+    return (str(date), name)

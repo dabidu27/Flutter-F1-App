@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from models import Drivers, DriversWithPoints
-from get_data import getStandingsData, getChampionshipStandings
+from models import Drivers, DriversWithPoints, RaceData
+from get_data import getStandingsData, getChampionshipStandings, getLastRace
 
 
 app = FastAPI()

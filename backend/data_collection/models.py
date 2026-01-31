@@ -14,3 +14,9 @@ class DriversWithPoints(BaseModel):
     team: str
     pos: str
     points: str
+
+
+class RaceData(BaseModel):
+
+    name: str
+    date: str
