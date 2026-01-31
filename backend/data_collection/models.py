@@ -19,4 +19,5 @@ class DriversWithPoints(BaseModel):
 class RaceData(BaseModel):
 
     name: str
-    date: str
+    datePretty: str
+    dateComputations: str

@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Driver>> top3Future;
   late Future<List<DriverWithPoints>> top3ChampionshipFuture;
   late Future<RaceData> lastRaceData;
+  late Future<RaceData> nextRaceData;
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     top3Future = ApiService.fetchLastRaceTop3();
     top3ChampionshipFuture = ApiService.fetchStandingsTop3();
     lastRaceData = ApiService.fetchLastRaceData();
+    nextRaceData = ApiService.fetchNextRaceData();
   }
 
   @override
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Cross axis = horizontal (left ↔ right)
 
                   //crossAxisAlignment.start = allign children to the left
-                  children: const [
+                  children: [
                     Text(
                       "Next Race",
                       style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -87,19 +89,57 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 8,
                     ), //this defines an empty box, so we basically put an empty space
-                    Text(
-                      "Bahrain Grand Prix",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text("02 March 2026"),
-                    SizedBox(height: 8),
-                    Text(
-                      "Race starts in 5 days",
-                      style: TextStyle(color: Colors.redAccent),
+                    FutureBuilder<RaceData>(
+                      future: nextRaceData,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        }
+
+                        if (!snapshot.hasData) {
+                          return Text("No data");
+                        }
+
+                        final raceData = snapshot.data!;
+
+                        if (raceData.dateComputations.isEmpty) {
+                          return Text("Invalid race date");
+                        }
+
+                        final raceDate = DateTime.parse(
+                          raceData.dateComputations,
+                        );
+                        final now = DateTime.now();
+                        final days = raceDate.difference(now).inDays;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              raceData.name,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(raceData.datePretty),
+                            SizedBox(height: 8),
+                            Text(
+                              "Race starts in ${days} days",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -153,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             SizedBox(height: 6),
-                            Text(raceData.date),
+                            Text(raceData.datePretty),
                           ],
                         );
                       },

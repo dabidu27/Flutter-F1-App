@@ -39,7 +39,7 @@ class ApiService {
       //also, at the end, we convert the result to a list using .toList()
       return data.map((jsonMap) => Driver.fromJson(jsonMap)).toList();
     } else {
-      throw Exception("Failed to load standings");
+      throw Exception("Failed to load last race standings");
     }
   }
 
@@ -53,7 +53,7 @@ class ApiService {
 
       return data.map((jsonMap) => DriverWithPoints.fromJson(jsonMap)).toList();
     } else {
-      throw Exception("Failed to load standings");
+      throw Exception("Failed to load championship standings");
     }
   }
 
@@ -66,7 +66,19 @@ class ApiService {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return RaceData.fromJson(data);
     } else {
-      throw Exception("Failed to load race data");
+      throw Exception("Failed to load last race data");
+    }
+  }
+
+  static Future<RaceData> fetchNextRaceData() async {
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:8000/next_race/data'),
+    );
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return RaceData.fromJson(data);
+    } else {
+      throw Exception("Failed to load next race data");
     }
   }
 }

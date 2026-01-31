@@ -59,11 +59,19 @@ async def getChampionship():
 async def fetchLastRaceData():
 
     lastRaceData = await getLastRace()
-    return RaceData(name=lastRaceData[0], date=lastRaceData[1])
+    return RaceData(
+        name=lastRaceData[0],
+        datePretty=lastRaceData[1],
+        dateComputations=lastRaceData[2],
+    )
 
 
 @app.get("/next_race/data", status_code=status.HTTP_200_OK, response_model=RaceData)
 async def fetchNextRaceData():
 
     nextRaceData = await getNextRace()
-    return RaceData(name=nextRaceData[0], date=nextRaceData[1])
+    return RaceData(
+        name=nextRaceData[0],
+        datePretty=nextRaceData[1],
+        dateComputations=nextRaceData[2],
+    )
