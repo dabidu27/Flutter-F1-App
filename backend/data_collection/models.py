@@ -21,6 +21,7 @@ class RaceData(BaseModel):
     name: str
     datePretty: str
     dateComputations: str
+    timeComputations: str
 
 
 class ConstructorsStandings(BaseModel):

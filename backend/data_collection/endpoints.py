@@ -84,6 +84,7 @@ async def fetchLastRaceData():
         name=lastRaceData[0],
         datePretty=lastRaceData[1],
         dateComputations=lastRaceData[2],
+        timeComputations=lastRaceData[3],
     )
 
 
@@ -95,4 +96,5 @@ async def fetchNextRaceData():
         name=nextRaceData[0],
         datePretty=nextRaceData[1],
         dateComputations=nextRaceData[2],
+        timeComputations=nextRaceData[3],
     )

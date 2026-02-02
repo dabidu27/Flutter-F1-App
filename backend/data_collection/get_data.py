@@ -99,8 +99,10 @@ def _getLastRace():
     date = past_races.iloc[0]["raceDate"]
     date_str = date.strftime("%d %B %Y")
     date_computations = date.strftime("%Y-%m-%d")
+    time = past_races.iloc[0]["raceTime"]
+    time_computations = time.strftime("%H:%M:%S")
     name = past_races.iloc[0]["raceName"]
-    return (name, date_str, date_computations)
+    return (name, date_str, date_computations, time_computations)
 
 
 def _getNextRace():
@@ -114,5 +116,7 @@ def _getNextRace():
     date = next_races.iloc[0]["raceDate"]
     date_str = date.strftime("%d %B %Y")
     date_computations = date.strftime("%Y-%m-%d")
+    time = next_races.iloc[0]["raceTime"]
+    time_computations = time.strftime("%H:%M:%S")
     name = next_races.iloc[0]["raceName"]
-    return (name, date_str, date_computations)
+    return (name, date_str, date_computations, time_computations)
