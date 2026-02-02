@@ -1,11 +1,12 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from models import Drivers, DriversWithPoints, RaceData
+from models import Drivers, DriversWithPoints, RaceData, ConstructorsStandings
 from get_data import (
     getStandingsData,
     getChampionshipStandings,
     getLastRace,
     getNextRace,
+    getConstructorsChampionshipStandings,
 )
 
 
@@ -53,6 +54,26 @@ async def getChampionship():
         pos += 1
 
     return driversResponse
+
+
+@app.get(
+    "/championship/constructors/standings",
+    response_model=list[ConstructorsStandings],
+    status_code=status.HTTP_200_OK,
+)
+async def getConstructorsChampionship():
+
+    constructors = await getConstructorsChampionshipStandings()
+    constructorsResponse = []
+    pos = 1
+    for constructor in constructors:
+        constructorsResponse.append(
+            ConstructorsStandings(
+                name=constructor[0], points=str(constructor[1]), pos=str(pos)
+            )
+        )
+        pos += 1
+    return constructorsResponse
 
 
 @app.get("/last_race/data", response_model=RaceData, status_code=status.HTTP_200_OK)

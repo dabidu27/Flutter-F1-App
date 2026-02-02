@@ -21,3 +21,10 @@ class RaceData(BaseModel):
     name: str
     datePretty: str
     dateComputations: str
+
+
+class ConstructorsStandings(BaseModel):
+
+    name: str
+    points: str
+    pos: str

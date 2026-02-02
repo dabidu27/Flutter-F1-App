@@ -24,6 +24,10 @@ async def getNextRace():
     return await asyncio.to_thread(_getNextRace)
 
 
+async def getConstructorsChampionshipStandings():
+    return await asyncio.to_thread(_loadConstructorsChampionshipStandings)
+
+
 def _loadStandings():
 
     ergast = Ergast()
@@ -71,6 +75,17 @@ def _loadChampionshipStandings():
     )
 
     return [driver1, driver2, driver3]
+
+
+def _loadConstructorsChampionshipStandings():
+
+    ergast = Ergast()
+    standings = ergast.get_constructor_standings(season=2025)
+    standings_df = standings.content[0][:3][["points", "constructorName"]]
+    team1 = (standings_df.iloc[0, 1], int(standings_df.iloc[0, 0]))
+    team2 = (standings_df.iloc[1, 1], int(standings_df.iloc[1, 0]))
+    team3 = (standings_df.iloc[2, 1], int(standings_df.iloc[2, 0]))
+    return [team1, team2, team3]
 
 
 def _getLastRace():
