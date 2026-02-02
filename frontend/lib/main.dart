@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/Constructor.dart';
 import 'models/DriverWithPoints.dart';
 import 'models/Driver.dart';
 import 'models/RaceData.dart';
@@ -125,6 +124,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         final now = DateTime.now();
                         final days = raceDate.difference(now).inDays;
 
+                        final raceStartUTC = DateTime.parse(
+                          "${raceData.dateComputations}T${raceData.timeComputations}Z",
+                        );
+
+                        final raceStartLocal = raceStartUTC
+                            .toLocal(); //conversion to local timezone is done client side (frontend), not server side (backend), because it depends on the user machine, not on the backend machine
+                        final raceStartLocalPretty =
+                            "${raceStartLocal.hour.toString().padLeft(2, '0')}:"
+                            "${raceStartLocal.minute.toString().padLeft(2, '0')}";
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -140,6 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 8),
                             Text(
                               "Race starts in ${days} days",
+                              style: TextStyle(color: Colors.redAccent),
+                            ),
+
+                            Text(
+                              raceStartLocalPretty,
                               style: TextStyle(color: Colors.redAccent),
                             ),
                           ],
@@ -186,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
 
                         final raceData = snapshot.data!;
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
