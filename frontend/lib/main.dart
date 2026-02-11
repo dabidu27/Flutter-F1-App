@@ -50,6 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ApiService.fetchConstructorsStandings();
   }
 
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //-appBar = top bar of the app
       appBar: AppBar(
         title: Text(
-          "F1 App",
+          "MyF1",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
         ),
         centerTitle: true,
@@ -303,6 +312,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 220,
                       child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage = index;
+                          });
+                        },
                         children: [
                           FutureBuilder<List<DriverWithPoints>>(
                             future: top3ChampionshipFuture,
@@ -380,6 +395,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
+                    ),
+
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(2, (index) {
+                        final bool isActive = index == _currentPage;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: isActive ? 10 : 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: isActive ? Colors.redAccent : Colors.grey,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        );
+                      }),
                     ),
                   ],
                 ),
