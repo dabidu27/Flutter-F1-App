@@ -184,10 +184,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Last Race",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Last Race",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+
+                        Icon(Icons.chevron_right),
+                      ],
                     ),
+
                     SizedBox(height: 8),
                     FutureBuilder<RaceData>(
                       future: lastRaceData,
@@ -258,22 +266,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         final drivers = snapshot
                             .data!; //! is a null check, so the map method knows we don t parse null data
 
-                        return Column(
-                          //drivers is a List<Driver> (it was wrapped in a Future object)
-                          //so we need to convert each Driver object into a DriverTile card
-                          //and also make it a list at the end because children: needs a list
-                          children: drivers
-                              .map(
-                                (driver) => DriverTile(
-                                  null,
-                                  driver.name,
-                                  driver.team,
-                                  driver.pos,
-                                  null,
-                                ),
-                              )
-                              .toList(),
-                        );
+                        // return Column(
+                        //   //drivers is a List<Driver> (it was wrapped in a Future object)
+                        //   //so we need to convert each Driver object into a DriverTile card
+                        //   //and also make it a list at the end because children: needs a list
+                        //   children: drivers
+                        //       .map(
+                        //         (driver) => DriverTile(
+                        //           null,
+                        //           driver.name,
+                        //           driver.team,
+                        //           driver.pos,
+                        //           null,
+                        //         ),
+                        //       )
+                        //       .toList(),
+                        // );
+
+                        return LastRaceStandingsCard(standings: drivers);
                       },
                     ),
                   ],

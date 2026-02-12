@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Constructor.dart';
+import 'package:flutter_application_1/models/Driver.dart';
 import 'package:flutter_application_1/models/DriverWithPoints.dart';
 
 class DriverTile extends StatelessWidget {
@@ -122,7 +123,7 @@ class FullStandingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Standings")),
+      appBar: AppBar(title: const Text("")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Card(
@@ -212,7 +213,7 @@ class FullConstuctorsStandingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Standings")),
+      appBar: AppBar(title: const Text("")),
       body: Padding(
         padding: EdgeInsets.all(16),
 
@@ -244,6 +245,95 @@ class FullConstuctorsStandingsScreen extends StatelessWidget {
                             teamName: team.name,
                             points: team.points,
                             pos: team.pos,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LastRaceStandingsCard extends StatelessWidget {
+  final List<Driver> standings;
+
+  const LastRaceStandingsCard({super.key, required this.standings});
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = standings.take(3).toList();
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return FullLastRaceStandingsCard(standings: standings);
+            },
+          ),
+        );
+      },
+
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: preview
+            .map(
+              (driver) =>
+                  DriverTile(null, driver.name, driver.team, driver.pos, null),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class FullLastRaceStandingsCard extends StatelessWidget {
+  final List<Driver> standings;
+
+  const FullLastRaceStandingsCard({super.key, required this.standings});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Standings",
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Expanded(
+                  child: ListView(
+                    children: standings
+                        .map(
+                          (driver) => DriverTile(
+                            null,
+                            driver.name,
+                            driver.team,
+                            driver.pos,
+                            null,
                           ),
                         )
                         .toList(),
