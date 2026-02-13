@@ -1,5 +1,6 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 from models import Drivers, DriversWithPoints, RaceData, ConstructorsStandings
 from get_data import (
     getStandingsData,
@@ -8,7 +9,11 @@ from get_data import (
     getNextRace,
     getConstructorsChampionshipStandings,
 )
-
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
+import json
+from cache_utils import getSecondsUntilRaceFinish
 
 app = FastAPI()
 app.add_middleware(
@@ -20,10 +25,41 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def startup():
+
+    redis = aioredis.from_url(
+        "redis://redis:6379", encoding="utf8", decode_responses=True
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="f1-cache")
+
+
 @app.get(
     "/last_race/standings", status_code=status.HTTP_200_OK, response_model=list[Drivers]
 )
-async def getStandings():
+async def getStandings(response: Response):
+    cache_key = "last_race_standings_data"
+    redis = FastAPICache.get_backend().redis
+
+    cached_data = await redis.get(cache_key)
+
+    # if data is in cache
+    if cached_data:
+
+        remaining_ttl = await redis.ttl(cache_key)
+
+        if remaining_ttl < 0:
+            # =-1 => no ttl, =-2 => expired ttl
+            remaining_ttl = 60  # default safety ttl 60 seconds
+
+        response.headers["X-Cache"] = "HIT"
+        response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
+        return json.loads(cached_data)
+
+    # if data is not in cache
+    nextRaceData = await getNextRace()
+    nextRaceIso = nextRaceData[2]
+    ttl_seconds = getSecondsUntilRaceFinish(nextRaceIso)
 
     drivers = await getStandingsData()
     driversResponse = []
@@ -31,6 +67,14 @@ async def getStandings():
     for driver in drivers:
         driversResponse.append(Drivers(name=driver[0], team=driver[1], pos=str(pos)))
         pos += 1
+
+    # save response to Redis (cache)
+    await redis.set(
+        cache_key, json.dumps(jsonable_encoder(driversResponse)), ex=ttl_seconds
+    )
+
+    response.headers["X-Cache"] = "MISS"
+    response.headers["Cache-Control"] = f"public, max_age={ttl_seconds}"
 
     return driversResponse
 

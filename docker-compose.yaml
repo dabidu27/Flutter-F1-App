@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # 1. Your FastAPI App
+  backend:
+    build: ./backend/data_collection
+    container_name: f1_backend
+    ports:
+      - "8000:8000"   # Maps your laptop's port 8000 to container's 8000
+    volumes:  
+      - ./backend/data_collection:/app # SYNC: Edits on your laptop update the container instantly
+    environment:
+      - REDIS_URL=redis://redis:6379 # Docker internal URL
+    depends_on:
+      - redis
+
+  # 2. Redis Cache
+  redis:
+    image: redis:alpine
+    container_name: f1_redis
+    ports:
+      - "6379:6379"   # Optional: Expose Redis to your laptop for debugging
