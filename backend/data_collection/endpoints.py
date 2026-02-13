@@ -47,11 +47,6 @@ async def getStandings(response: Response):
     if cached_data:
 
         remaining_ttl = await redis.ttl(cache_key)
-
-        if remaining_ttl < 0:
-            # =-1 => no ttl, =-2 => expired ttl
-            remaining_ttl = 60  # default safety ttl 60 seconds
-
         response.headers["X-Cache"] = "HIT"
         response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
         return json.loads(cached_data)
@@ -93,8 +88,6 @@ async def getChampionship(response: Response):
     if cached_data:
 
         remaining_ttl = await redis.ttl(cache_key)
-        if remaining_ttl < 0:
-            remaining_ttl = 60
         response.headers["X-Cache"] = "HIT"
         response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
 
@@ -137,8 +130,6 @@ async def getConstructorsChampionship(response: Response):
     if cached_data:
 
         remaining_ttl = await redis.ttl(cache_key)
-        if remaining_ttl < 0:
-            remaining_ttl = 60
         response.headers["X-Cache"] = "HIT"
         response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
         return json.loads(cached_data)
@@ -168,9 +159,43 @@ async def getConstructorsChampionship(response: Response):
 
 
 @app.get("/last_race/data", response_model=RaceData, status_code=status.HTTP_200_OK)
-async def fetchLastRaceData():
+async def fetchLastRaceData(response: Response):
+
+    cache_key = "last_race_data"
+    redis = FastAPICache.get_backend().redis
+    cached_data = await redis.get(cache_key)
+
+    if cached_data:
+
+        remaining_ttl = await redis.ttl(cache_key)
+        response.headers["X-Cache"] = "HIT"
+        response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
+
+        return json.loads(cached_data)
+
+    nextRaceData = await getNextRace()
+    nextRaceIso = nextRaceData[2]
+    ttl_seconds = getSecondsUntilRaceFinish(nextRaceIso)
 
     lastRaceData = await getLastRace()
+
+    response.headers["X-Cache"] = "Miss"
+    response.headers["Cache-Control"] = f"public, max_age={ttl_seconds}"
+    await redis.set(
+        cache_key,
+        json.dumps(
+            jsonable_encoder(
+                RaceData(
+                    name=lastRaceData[0],
+                    datePretty=lastRaceData[1],
+                    dateComputations=lastRaceData[2],
+                    timeComputations=lastRaceData[3],
+                )
+            )
+        ),
+        ex=ttl_seconds,
+    )
+
     return RaceData(
         name=lastRaceData[0],
         datePretty=lastRaceData[1],
@@ -180,9 +205,38 @@ async def fetchLastRaceData():
 
 
 @app.get("/next_race/data", status_code=status.HTTP_200_OK, response_model=RaceData)
-async def fetchNextRaceData():
+async def fetchNextRaceData(response: Response):
+
+    cache_key = "next_race_data"
+    redis = FastAPICache.get_backend().redis
+    cached_data = await redis.get(cache_key)
+
+    if cached_data:
+
+        remaining_ttl = await redis.ttl(cache_key)
+        response.headers["X-Cache"] = "HIT"
+        response.headers["Cache-Control"] = f"public, max_age={remaining_ttl}"
+        return json.loads(cached_data)
 
     nextRaceData = await getNextRace()
+    nextRaceIso = nextRaceData[2]
+    ttl_seconds = getSecondsUntilRaceFinish(nextRaceIso)
+
+    await redis.set(
+        cache_key,
+        json.dumps(
+            jsonable_encoder(
+                RaceData(
+                    name=nextRaceData[0],
+                    datePretty=nextRaceData[1],
+                    dateComputations=nextRaceData[2],
+                    timeComputations=nextRaceData[3],
+                )
+            )
+        ),
+        ex=ttl_seconds,
+    )
+
     return RaceData(
         name=nextRaceData[0],
         datePretty=nextRaceData[1],
