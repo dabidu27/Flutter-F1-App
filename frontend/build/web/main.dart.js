@@ -65747,7 +65747,7 @@ A.U6.prototype={
 $1(a){return new A.eW(a.a,a.b,a.c,null,null)},
 $S:150}
 A.D3.prototype={
-N(a){return new A.uH(B.Ad,"F1 Dashboard",A.afw(B.W,null,null),!1,null)}}
+N(a){return new A.uH(B.Ad,"MyF1",A.afw(B.W,null,null),!1,null)}}
 A.u2.prototype={
 am(){return new A.K_(A.atr())}}
 A.K_.prototype={
