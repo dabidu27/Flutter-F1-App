@@ -1,6 +1,6 @@
-# Flutter-F1-App
+# MyF1
 
-Full-stack Formula 1 dashboard: a Flutter frontend that consumes a FastAPI backend with Redis caching to show upcoming race details, last race results, and championship standings.
+Full-stack Formula 1 Web App: a Flutter frontend that consumes a FastAPI backend with Redis caching to show upcoming race details, last race results, and championship standings.
 
 ## Features
 
