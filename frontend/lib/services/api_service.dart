@@ -7,6 +7,7 @@ import '../models/Constructor.dart';
 
 //we create a static class that holds the functions for our api service
 class ApiService {
+  static final apiBaseUrl = 'https://f1-backend-fylt.onrender.com';
   //because in flutter http requests are an asynchronised task, we need to return a Future object
   //the Future objects holds a list of Driver objects, because our api endpoint returns data for 3 drivers
   static Future<List<Driver>> fetchLastRaceTop3() async {
@@ -15,7 +16,7 @@ class ApiService {
     //observe the async await mechanism
     //http.get doesn't accept a string, instead we need to pass a Uri.parse(our api endpoint)
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/last_race/standings'),
+      Uri.parse('$apiBaseUrl/last_race/standings'),
     );
 
     //we check the status code of the request
@@ -46,7 +47,7 @@ class ApiService {
 
   static Future<List<DriverWithPoints>> fetchStandingsTop3() async {
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/championship/standings'),
+      Uri.parse('$apiBaseUrl/championship/standings'),
     );
 
     if (response.statusCode == 200) {
@@ -59,22 +60,20 @@ class ApiService {
   }
 
   static Future<RaceData> fetchLastRaceData() async {
-    final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/last_race/data'),
-    );
+    final response = await http
+        .get(Uri.parse('$apiBaseUrl/last_race/data'))
+        .timeout(const Duration(seconds: 10));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return RaceData.fromJson(data);
     } else {
-      throw Exception("Failed to load last race data");
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
     }
   }
 
   static Future<RaceData> fetchNextRaceData() async {
-    final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/next_race/data'),
-    );
+    final response = await http.get(Uri.parse('$apiBaseUrl/next_race/data'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       return RaceData.fromJson(data);
@@ -85,7 +84,7 @@ class ApiService {
 
   static Future<List<Constructor>> fetchConstructorsStandings() async {
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/championship/constructors/standings'),
+      Uri.parse('$apiBaseUrl/championship/constructors/standings'),
     );
 
     if (response.statusCode == 200) {
