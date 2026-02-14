@@ -17,7 +17,7 @@ class F1App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'F1 Dashboard',
+      title: 'MyF1',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: const HomeScreen(),
